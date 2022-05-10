@@ -1,13 +1,14 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const { createError } = require("../../helpers");
 
 const { User, schemas } = require("../../models/user");
 
-
 const router = express.Router();
 
+const { SECRET_KEY } = process.env;
 
 router.post("/register", async (req, res, next) => {
     try {
@@ -48,7 +49,12 @@ router.post("/login", async (req, res, next) => {
         if (!passwordCompare) {
             throw createError(401, "Password is wrong")
         }
-        const token = "vfgjhk.fghjk.fghjk";
+
+        const payload = {
+            id: user._id
+        }
+
+        const token = jwt.sign(payload, SECRET_KEY, {expiresIn: "1h"});
         res.json({
             token,
             user: {
