@@ -15,15 +15,15 @@ const userShema = Schema({
         unique: true,
         match: emailRegexp,
     },
-    // subscription: {
-    //     type: String,
-    //     enum: ["starter", "pro", "business"],
-    //     default: "starter"
-    // },
-    // token: {
-    //     type: String,
-    //     default: null,
-    // },
+    subscription: {
+        type: String,
+        enum: ["starter", "pro", "business"],
+        default: "starter"
+    },
+    token: {
+        type: String,
+        default: null,
+    },
 }, { versionKey: false, timestamps: true });
 
 const registerJoiShema = Joi.object({

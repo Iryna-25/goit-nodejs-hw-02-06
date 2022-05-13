@@ -10,7 +10,9 @@ const router = express.Router();
 
 const { SECRET_KEY } = process.env;
 
-router.post("/register", async (req, res, next) => {
+const { auth } = require("../../middlewares");
+
+router.post("/signup", async (req, res, next) => {
     try {
         const { error } = schemas.register.validate(req.body);
         if (error) {
@@ -54,13 +56,33 @@ router.post("/login", async (req, res, next) => {
             id: user._id
         }
 
-        const token = jwt.sign(payload, SECRET_KEY, {expiresIn: "1h"});
+        const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "1h" });
+        
+        await User.findByIdAndUpdate(user._id, {token})
+
         res.json({
             token,
             user: {
                 email
             }
         })
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get("/current", auth, async (req, res, next) => {
+    const { email } = req.user;
+    res.json(
+        { email }
+    )
+});
+
+router.get("/logout", auth, async (req, res, next) => {
+    try {
+        const { _id } = req.user;
+        await User.findByIdAndUpdate(_id, { token: null });
+        res.status(204).send();
     } catch (error) {
         next(error);        
     }
